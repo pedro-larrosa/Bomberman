@@ -10,8 +10,8 @@ namespace Bomberman
 {
     public abstract class Sprite 
     {
-        Texture2D imagen;
-        Vector2 posicion;
+        protected Texture2D imagen;
+        protected Vector2 posicion;
 
         public Sprite(int x, int y)
         {
@@ -20,8 +20,7 @@ namespace Bomberman
 
         public void Dibujar(SpriteBatch s)
         {
-            if(imagen != null)
-                s.Draw(imagen, new Rectangle((int)posicion.X, (int)posicion.Y, imagen.Width, imagen.Height), Color.White);
+            s.Draw(imagen, new Rectangle((int)posicion.X, (int)posicion.Y, 40, 40), Color.White);
         }
 
         public float X
@@ -51,6 +50,11 @@ namespace Bomberman
         public void SetImagen(Texture2D imagen)
         {
             this.imagen = imagen;
+        }
+
+        public Texture2D GetImagen()
+        {
+            return imagen;
         }
     }
 }

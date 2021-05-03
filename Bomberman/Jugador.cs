@@ -9,12 +9,16 @@ namespace Bomberman
 {
     class Jugador : Sprite
     {
-        Vector2 velocidad;
+        int velocidad;
 
         public Jugador(int x, int y) : base(x, y)
         {
-            velocidad.X = (int)100;
-            velocidad.Y = (int)100;
+            velocidad = 250;
+        }
+
+        public int GetVelocidad()
+        {
+            return velocidad;
         }
     }
 }
