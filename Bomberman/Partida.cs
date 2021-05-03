@@ -11,10 +11,16 @@ namespace Bomberman
     {
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
-
+        Texture2D texto;
 
         string[] mapa = {
             "XXXXXXXXXXXXX",
+            "X           X",
+            "X X X X X X X",
+            "X           X",
+            "X X X X X X X",
+            "X           X",
+            "X X X X X X X",
             "X           X",
             "X X X X X X X",
             "X           X",
@@ -34,26 +40,30 @@ namespace Bomberman
         Jugador jugador;
         List<Obstaculo> paredes;
 
+
         public Partida()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-            graphics.PreferredBackBufferWidth = 960;
-            graphics.PreferredBackBufferHeight = 600;
+            graphics.PreferredBackBufferWidth = 920;
+            graphics.PreferredBackBufferHeight = 560;
             graphics.ApplyChanges();
         }
 
         protected override void Initialize()
         {
+            //Inicializamos el jugador
             jugador = new Jugador(80, 80);
+
+            //Se generan las paredes
             paredes = new List<Obstaculo>();
             for (int i = 0; i < mapa.Length; i++)
             {
                 for(int j = 0; j < mapa[i].Length; j++)
                 {
                     if (mapa[i][j] == 'X')
-                        paredes.Add(new Obstaculo((i + 1) * 40, (j + 1) * 40));
+                        paredes.Add(new Obstaculo(i * 40, (j + 1) * 40));
                 }
             }
             
@@ -64,8 +74,9 @@ namespace Bomberman
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-
+            //se carga la imagen del jugador
             jugador.SetImagen(Content.Load<Texture2D>("sprite"));
+            //se cargan las imagenes de las paredes
             foreach (Obstaculo p in paredes)
                 p.SetImagen(Content.Load<Texture2D>("muroX"));
             // TODO: use this.Content to load your game content here
@@ -86,6 +97,7 @@ namespace Bomberman
             if (teclado.IsKeyDown(Keys.D))
                 jugador.X += jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
+            //Se comprueban colisiones con las paredes
             foreach(Obstaculo p in paredes)
             {
                 if (new Rectangle((int)p.X, (int)p.Y, 30, 30).Intersects(

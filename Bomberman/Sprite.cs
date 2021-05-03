@@ -51,10 +51,5 @@ namespace Bomberman
         {
             this.imagen = imagen;
         }
-
-        public Texture2D GetImagen()
-        {
-            return imagen;
-        }
     }
 }
