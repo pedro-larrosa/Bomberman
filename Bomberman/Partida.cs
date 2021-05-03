@@ -12,19 +12,25 @@ namespace Bomberman
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
+
         string[] mapa;
+        Jugador jugador;
 
         public Partida()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            graphics.PreferredBackBufferWidth = 960;
+            graphics.PreferredBackBufferHeight = 600;
+            graphics.ApplyChanges();
         }
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            jugador = new Jugador(100, 100);
 
+            
             base.Initialize();
         }
 
@@ -32,6 +38,8 @@ namespace Bomberman
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+
+            jugador.SetImagen(Content.Load<Texture2D>("sprite"));
             // TODO: use this.Content to load your game content here
         }
 
@@ -40,7 +48,7 @@ namespace Bomberman
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+
 
             base.Update(gameTime);
         }
@@ -50,7 +58,7 @@ namespace Bomberman
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin();
-
+            jugador.Dibujar(spriteBatch);
             spriteBatch.End();
             // TODO: Add your drawing code here
 

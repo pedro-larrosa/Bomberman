@@ -7,7 +7,7 @@ namespace Bomberman
         [STAThread]
         static void Main()
         {
-            using (var game = new Inicio())
+            using (var game = new Partida())
                 game.Run();
         }
     }

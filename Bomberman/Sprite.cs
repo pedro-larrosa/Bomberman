@@ -8,20 +8,20 @@ using Microsoft.Xna.Framework.Content;
 
 namespace Bomberman
 {
-    public abstract class Sprite
+    public abstract class Sprite 
     {
         Texture2D imagen;
         Vector2 posicion;
 
-        public Sprite(int x, int y, Texture2D imagen)
+        public Sprite(int x, int y)
         {
             posicion = new Vector2(x, y);
-            this.imagen = imagen;
         }
 
         public void Dibujar(SpriteBatch s)
         {
-            s.Draw(imagen, new Rectangle((int)posicion.X, (int)posicion.Y, imagen.Width, imagen.Height), Color.White);
+            if(imagen != null)
+                s.Draw(imagen, new Rectangle((int)posicion.X, (int)posicion.Y, imagen.Width, imagen.Height), Color.White);
         }
 
         public float X
@@ -48,5 +48,9 @@ namespace Bomberman
             }
         }
 
+        public void SetImagen(Texture2D imagen)
+        {
+            this.imagen = imagen;
+        }
     }
 }
