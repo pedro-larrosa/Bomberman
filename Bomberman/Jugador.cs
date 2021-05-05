@@ -13,7 +13,7 @@ namespace Bomberman
 
         public Jugador(int x, int y) : base(x, y)
         {
-            velocidad = 250;
+            velocidad = 100;
         }
 
         public int GetVelocidad()
