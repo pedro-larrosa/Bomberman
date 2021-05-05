@@ -41,20 +41,9 @@ namespace Bomberman
             "X           X",
             "XXXXXXXXXXXXX"};
         Jugador jugador;
-        static List<Obstaculo> paredes;
-        static List<Obstaculo> muros;
+        List<Obstaculo> paredes;
+        List<Obstaculo> muros;
         List<Bomba> bombas;
-
-        public static List<Obstaculo> GetMuros()
-        {
-            return muros; 
-        }
-
-        public static List<Obstaculo> GetParedes()
-        {
-            return paredes;
-        }
-
 
         public Partida()
         {
@@ -162,7 +151,7 @@ namespace Bomberman
             {
                 if ((bombas[i].Contador += gameTime.ElapsedGameTime.TotalSeconds) >= 2)
                 {
-                    bombas[i].Explotar(Content);
+                    bombas[i].Explotar(Content, paredes);
                     foreach (Explosion e in bombas[i].GetExplosion())
                         e.SetImagen(Content.Load<Texture2D>("centroBomba"));
                 }
