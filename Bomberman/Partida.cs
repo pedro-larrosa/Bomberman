@@ -55,23 +55,19 @@ namespace Bomberman
             graphics.ApplyChanges();
         }
 
-        protected override void Initialize()
+        private void generarMapa()
         {
-            //Inicializamos el jugador
-            jugador = new Jugador(40, 80);
-
-            //Se generan las paredes
+            //Se generan paredes
             paredes = new List<Obstaculo>();
             for (int i = 0; i < mapa.Length; i++)
             {
-                for(int j = 0; j < mapa[i].Length; j++)
+                for (int j = 0; j < mapa[i].Length; j++)
                 {
                     if (mapa[i][j] == 'X')
                         paredes.Add(new Obstaculo(i * 40, (j + 1) * 40));
                 }
             }
-
-            //Generar muros
+            //se generan muros
             muros = new List<Obstaculo>();
             int numMuros = 0, x, y;
             r = new Random();
@@ -82,7 +78,7 @@ namespace Bomberman
                 y = r.Next(2, 13) * 40;
                 added = false;
 
-                if(x > 160 || y > 160)
+                if (x > 160 || y > 160)
                 {
                     for (int i = 0; i < paredes.Count && !added; i++)
                     {
@@ -96,6 +92,14 @@ namespace Bomberman
                     }
                 }
             }
+        }
+        protected override void Initialize()
+        {
+            //Inicializamos el jugador
+            jugador = new Jugador(40, 80);
+
+            //se genera el mapa
+            generarMapa();
 
             //Inicializamos bombas
             bombas = new List<Bomba>();
@@ -128,6 +132,15 @@ namespace Bomberman
                 Exit();
             var teclado = Keyboard.GetState();
 
+            //Colocar bomba
+            Bomba bAux;
+            if (teclado.IsKeyDown(Keys.E))
+            {
+                bAux = new Bomba((int)(jugador.X - (jugador.X % 40)), (int)(jugador.Y - (jugador.Y % 40)), longitudBomba);
+                bAux.SetImagen(Content.Load<Texture2D>("bomba"));
+                bombas.Add(bAux);
+            }
+
             //Movimiento jugador
             if (teclado.IsKeyDown(Keys.W))
                 jugador.Y -= jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -138,22 +151,24 @@ namespace Bomberman
             if (teclado.IsKeyDown(Keys.D))
                 jugador.X += jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            Bomba bAux;
+            
             //HACER FUNCIONAMIENTO DE LAS BOMBAS
-            if (teclado.IsKeyDown(Keys.E))
-            {
-                bAux = new Bomba((int)(jugador.X - (jugador.X % 40)),(int)(jugador.Y - (jugador.Y % 40)), longitudBomba);
-                bAux.SetImagen(Content.Load<Texture2D>("bomba"));
-                bombas.Add(bAux);
-            }
-
             for(int i = 0; i < bombas.Count; i++)
             {
-                if ((bombas[i].Contador += gameTime.ElapsedGameTime.TotalSeconds) >= 2)
+                if ((int)(bombas[i].Contador += gameTime.ElapsedGameTime.TotalSeconds) == 2)
                 {
-                    bombas[i].Explotar(Content, paredes);
+                    bombas[i].Explotar(paredes, muros);
                     foreach (Explosion e in bombas[i].GetExplosion())
-                        e.SetImagen(Content.Load<Texture2D>("centroBomba"));
+                    {
+                        e.SetImagen(Content.Load<Texture2D>("explosion"));
+                        //Colisiones de las explosiones con los muros para destruirlos
+                        for (int j = 0; j < muros.Count; j++)
+                        {
+                            if (new Rectangle((int)muros[j].X, (int)muros[j].Y, 40, 40).Intersects(
+                                new Rectangle((int)e.X, (int)e.Y, 40, 40)))
+                                muros.RemoveAt(j);
+                        }
+                    }
                 }
 
                 if(bombas[i].Contador >= 4)
@@ -179,7 +194,7 @@ namespace Bomberman
 
             foreach (Obstaculo p in muros)
             {
-                if (new Rectangle((int)p.X, (int)p.Y, 30, 30).Intersects(
+                if (new Rectangle((int)p.X, (int)p.Y, 40, 40).Intersects(
                     new Rectangle((int)jugador.X, (int)jugador.Y, 40, 40)))
                 {
                     if (teclado.IsKeyDown(Keys.W))
