@@ -23,7 +23,7 @@ namespace Bomberman
 
         public void Explotar(List<Obstaculo> paredes, List<Obstaculo> muros)
         {
-            explosion.Add(new Explosion((int)X, (int)Y));
+            explosion.Add(new Explosion(X, Y));
             bool colisionan;
             for(int i = 0; i < 4; i++)
             {
@@ -34,65 +34,64 @@ namespace Bomberman
                     {
                         case 0:
                             foreach (Obstaculo p in paredes)
-                                if (new Rectangle((int)X + (j * 40), (int)Y, 40, 40).Intersects(
-                                    new Rectangle((int)p.X, (int)p.Y, 40, 40)))
+                                if (new Rectangle(X + (j * 40), Y, 40, 40).Intersects(
+                                    new Rectangle(p.X, p.Y, 40, 40)))
                                     colisionan = true;
 
                             if (!colisionan)
                             {
                                 foreach (Obstaculo m in muros)
-                                    if (new Rectangle((int)X + (j * 40), (int)Y, 40, 40).Intersects(
-                                        new Rectangle((int)m.X, (int)m.Y, 40, 40)))
+                                    if (new Rectangle(X + (j * 40), Y, 40, 40).Intersects(
+                                        new Rectangle(m.X, m.Y, 40, 40)))
                                         colisionan = true;
-                                explosion.Add(new Explosion((int)X + (j * 40), (int)Y));
+                                explosion.Add(new Explosion(X + (j * 40), Y));
                             }
                                 
                             break;
                         case 1:
                             foreach (Obstaculo p in paredes)
-                                if (new Rectangle((int)X - (j * 40), (int)Y, 40, 40).Intersects(
-                                    new Rectangle((int)p.X, (int)p.Y, 40, 40)))
+                                if (new Rectangle(X - (j * 40), Y, 40, 40).Intersects(
+                                    new Rectangle(p.X, p.Y, 40, 40)))
                                     colisionan = true;
 
                             if (!colisionan)
                             {
                                 foreach (Obstaculo m in muros)
-                                    if (new Rectangle((int)X - (j * 40), (int)Y, 40, 40).Intersects(
-                                        new Rectangle((int)m.X, (int)m.Y, 40, 40)))
+                                    if (new Rectangle(X - (j * 40), Y, 40, 40).Intersects(
+                                        new Rectangle(m.X, m.Y, 40, 40)))
                                         colisionan = true;
-                                explosion.Add(new Explosion((int)X - (j * 40), (int)Y));
+                                explosion.Add(new Explosion(X - (j * 40), Y));
                             }
                             break;
                         case 2:
                             foreach (Obstaculo p in paredes)
-                                if (new Rectangle((int)X, (int)Y + (j * 40), 40, 40).Intersects(
-                                    new Rectangle((int)p.X, (int)p.Y, 40, 40)))
+                                if (new Rectangle(X, Y + (j * 40), 40, 40).Intersects(
+                                    new Rectangle(p.X, p.Y, 40, 40)))
                                     colisionan = true;
 
                             if (!colisionan)
                             {
                                 foreach (Obstaculo m in muros)
-                                    if (new Rectangle((int)X, (int)Y + (j * 40), 40, 40).Intersects(
-                                        new Rectangle((int)m.X, (int)m.Y, 40, 40)))
+                                    if (new Rectangle(X, Y + (j * 40), 40, 40).Intersects(
+                                        new Rectangle(m.X, m.Y, 40, 40)))
                                         colisionan = true;
-                                explosion.Add(new Explosion((int)X, (int)Y + (j * 40)));
+                                explosion.Add(new Explosion(X, Y + (j * 40)));
                             }
                             break;
                         case 3:
                             foreach (Obstaculo p in paredes)
-                                if (new Rectangle((int)X, (int)Y - (j * 40), 40, 40).Intersects(
-                                    new Rectangle((int)p.X, (int)p.Y, 40, 40)))
+                                if (new Rectangle(X, Y - (j * 40), 40, 40).Intersects(
+                                    new Rectangle(p.X, p.Y, 40, 40)))
                                     colisionan = true;
 
                             if (!colisionan)
                             {
                                 foreach (Obstaculo m in muros)
-                                    if (new Rectangle((int)X, (int)Y - (j * 40), 40, 40).Intersects(
-                                        new Rectangle((int)m.X, (int)m.Y, 40, 40)))
+                                    if (new Rectangle(X, Y - (j * 40), 40, 40).Intersects(
+                                        new Rectangle(m.X, m.Y, 40, 40)))
                                         colisionan = true;
-                                explosion.Add(new Explosion((int)X, (int)Y - (j * 40)));
+                                explosion.Add(new Explosion(X, Y - (j * 40)));
                             }
-                                
                             break;
                     }
                 }

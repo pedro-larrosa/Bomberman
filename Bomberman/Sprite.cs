@@ -23,11 +23,11 @@ namespace Bomberman
             s.Draw(imagen, new Rectangle((int)posicion.X, (int)posicion.Y, 40, 40), Color.White);
         }
 
-        public float X
+        public int X
         {
             get
             {
-                return posicion.X;
+                return (int)posicion.X;
             }
             set
             {
@@ -35,11 +35,11 @@ namespace Bomberman
             }
         }
 
-        public float Y
+        public int Y
         {
             get
             {
-                return posicion.Y;
+                return (int)posicion.Y;
             }
             set
             {

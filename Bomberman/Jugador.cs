@@ -13,7 +13,12 @@ namespace Bomberman
 
         public Jugador(int x, int y) : base(x, y)
         {
-            velocidad = 100;
+            velocidad = 120;
+        }
+
+        new public void Dibujar(SpriteBatch s)
+        {
+            s.Draw(imagen, new Rectangle((int)posicion.X, (int)posicion.Y, 30, 30), Color.White);
         }
 
         public int GetVelocidad()
