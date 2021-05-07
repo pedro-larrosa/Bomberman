@@ -21,6 +21,17 @@ namespace Bomberman
             this.longitud = longitud;
         }
 
+        //Hago este override para que el Contains cuando pongo una bomba funcione como yo quiero
+        public override bool Equals(object obj)
+        {
+            return X == ((Bomba)obj).X && Y == ((Bomba)obj).Y;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         public void Explotar(List<Obstaculo> paredes, List<Obstaculo> muros)
         {
             explosion.Add(new Explosion(X, Y));
