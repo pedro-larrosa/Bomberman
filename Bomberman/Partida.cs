@@ -136,10 +136,10 @@ namespace Bomberman
             Bomba bAux;
             if (teclado.IsKeyDown(Keys.E))
             {
+                bAux = new Bomba(jugador.X - (jugador.X % 40), jugador.Y - (jugador.Y % 40), longitudBomba);
                 //He cambiado el .Equals() para que compare solo las posiciones X e Y
-                if(!bombas.Contains(new Bomba(jugador.X - (jugador.X % 40), jugador.Y - (jugador.Y % 40), longitudBomba)))
+                if (!bombas.Contains(bAux))
                 {
-                    bAux = new Bomba(jugador.X - (jugador.X % 40), jugador.Y - (jugador.Y % 40), longitudBomba);
                     bAux.SetImagen(Content.Load<Texture2D>("bomba"));
                     bombas.Add(bAux);
                 }
@@ -238,8 +238,8 @@ namespace Bomberman
             //Dibujar las paredes
             foreach (Obstaculo p in paredes)
                 p.Dibujar(spriteBatch);
-            spriteBatch.DrawString(texto, "TIEMPO " + bombas.Contains(new Bomba(jugador.X - (jugador.X % 40), jugador.Y - (jugador.Y % 40), longitudBomba)), new Vector2(9, 9), Color.Black);
-            spriteBatch.DrawString(texto, "TIEMPO " + bombas.Contains(new Bomba(jugador.X - (jugador.X % 40), jugador.Y - (jugador.Y % 40), longitudBomba)), new Vector2(5, 5), Color.White);
+            spriteBatch.DrawString(texto, "TIEMPO " + (int)tiempo, new Vector2(9, 9), Color.Black);
+            spriteBatch.DrawString(texto, "TIEMPO " + (int)tiempo, new Vector2(5, 5), Color.White);
             spriteBatch.End();
             base.Draw(gameTime);
         }
