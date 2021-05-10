@@ -44,6 +44,7 @@ namespace Bomberman
         List<Obstaculo> paredes;
         List<Obstaculo> muros;
         List<Bomba> bombas;
+        List<Enemigo> enemigos;
 
         public Partida()
         {
@@ -159,7 +160,7 @@ namespace Bomberman
             //HACER FUNCIONAMIENTO DE LAS BOMBAS
             for(int i = 0; i < bombas.Count; i++)
             {
-                if ((int)(bombas[i].Contador += gameTime.ElapsedGameTime.TotalSeconds) == 2)
+                if ((int)(bombas[i].Contador += gameTime.ElapsedGameTime.TotalSeconds) == 2 && !bombas[i].HaExplotado())
                 {
                     bombas[i].Explotar(paredes, muros);
                     foreach (Explosion e in bombas[i].GetExplosion())
@@ -238,8 +239,8 @@ namespace Bomberman
             //Dibujar las paredes
             foreach (Obstaculo p in paredes)
                 p.Dibujar(spriteBatch);
-            spriteBatch.DrawString(texto, "TIEMPO " + (int)tiempo, new Vector2(9, 9), Color.Black);
-            spriteBatch.DrawString(texto, "TIEMPO " + (int)tiempo, new Vector2(5, 5), Color.White);
+            spriteBatch.DrawString(texto, "TIEMPO " + bombas.Count, new Vector2(9, 9), Color.Black);
+            spriteBatch.DrawString(texto, "TIEMPO " + bombas.Count, new Vector2(5, 5), Color.White);
             spriteBatch.End();
             base.Draw(gameTime);
         }

@@ -13,10 +13,12 @@ namespace Bomberman
         List<Explosion> explosion;
         int longitud;
         double contador;
+        bool explotado;
 
         public Bomba(int x, int y, int longitud) : base(x, y)
         {
             explosion = new List<Explosion>();
+            explotado = false;
             contador = 0;
             this.longitud = longitud;
         }
@@ -34,6 +36,7 @@ namespace Bomberman
 
         public void Explotar(List<Obstaculo> paredes, List<Obstaculo> muros)
         {
+            explotado = true;
             explosion.Add(new Explosion(X, Y));
             bool colisionan;
             for(int i = 0; i < 4; i++)
@@ -124,6 +127,11 @@ namespace Bomberman
         public List<Explosion> GetExplosion()
         {
             return explosion;
+        }
+
+        public bool HaExplotado()
+        {
+            return explotado;
         }
     }
 }
