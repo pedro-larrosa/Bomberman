@@ -165,7 +165,7 @@ namespace Bomberman
             }
         }
 
-        private bool colisiona(int x, int y, int d = 40)
+        private bool colisiona(int x, int y, int d = 40, bool esEnemigo = false)
         {
             bool colisiona = false;
             for(int i = 0; i < paredes.Count && !colisiona; i++)
@@ -187,6 +187,16 @@ namespace Bomberman
 
             if (!colisiona)
             {
+                for(int i = 0; i < bombas.Count && !colisiona; i++)
+                {
+                    if (new Rectangle(x, y, 40, 40).Intersects(
+                        new Rectangle(bombas[i].X, bombas[i].Y, 40, 40)))
+                        colisiona = true;
+                }
+            }
+
+            if (!colisiona && !esEnemigo)
+            {
                 for (int i = 0; i < enemigos.Count && !colisiona; i++)
                 {
                     if (new Rectangle(x, y, 40, 40).Intersects(
@@ -203,15 +213,15 @@ namespace Bomberman
             //Inicializamos el jugador
             jugador = new Jugador(40, 80);
 
+            //Inicializamos bombas
+            bombas = new List<Bomba>();
+            longitudBomba = 1;
+
             //se genera el mapa
             generarMapa();
 
             //Se generan los enemigos
             generarEnemigos();
-
-            //Inicializamos bombas
-            bombas = new List<Bomba>();
-            longitudBomba = 1;
 
             //Se inicializa el contador
             tiempo = 201;
@@ -238,7 +248,8 @@ namespace Bomberman
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            var teclado = Keyboard.GetState();
+
+            KeyboardState teclado = Keyboard.GetState();
 
             //Colocar bomba
             Bomba bAux;
@@ -263,6 +274,9 @@ namespace Bomberman
             if (teclado.IsKeyDown(Keys.D))
                 jugador.X += (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
 
+            //Se mueven los enemigos
+            foreach (Enemigo e in enemigos)
+                e.Mover(gameTime);
             
             //HACER FUNCIONAMIENTO DE LAS BOMBAS
             for(int i = 0; i < bombas.Count; i++)
@@ -285,6 +299,25 @@ namespace Bomberman
 
                 if(bombas[i].Contador >= 4)
                     bombas.RemoveAt(i);
+            }
+
+            //Se comprueban colisiones con enemigos
+            foreach(Enemigo e in enemigos)
+            {
+                if(colisiona(e.X, e.Y, 40,true))
+                {
+                    e.X -= (int)(e.GetVelocidadX() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                    e.Y -= (int)(e.GetVelocidadY() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                    e.CambiarDireccion();
+                }
+
+                //Aquí se comprueba si pasa por al lado de un hueco y hay una probabilidad de que cambie de direccion
+                //Para que no entren en bucles
+                if ((e.Y % 80 == 0 && e.GetVelocidadX() == 0 ||
+                    e.X % 40 == 0 && e.X % 80 != 0 && e.GetVelocidadY() == 0) 
+                    && r.Next(0, 3) == 2)
+                    e.CambiarDireccion();
+
             }
 
             //Se comprueban colisiones con las paredes

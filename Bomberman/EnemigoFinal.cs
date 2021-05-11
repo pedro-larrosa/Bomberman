@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Xna.Framework;
 
 namespace Bomberman
 {
@@ -9,7 +10,7 @@ namespace Bomberman
         public EnemigoFinal(int x, int y) : base(x, y, 200)
         { }
 
-        public override void Mover()
+        public override void CambiarDireccion()
         {
             throw new NotImplementedException();
         }
