@@ -170,7 +170,7 @@ namespace Bomberman
             bool colisiona = false;
             for(int i = 0; i < paredes.Count && !colisiona; i++)
             {
-                if (new Rectangle(x, y, 40, 40).Intersects(
+                if (new Rectangle(x, y, d, d).Intersects(
                     new Rectangle(paredes[i].X, paredes[i].Y, 40, 40)))
                     colisiona = true;
             }
@@ -179,17 +179,17 @@ namespace Bomberman
             {
                 for (int i = 0; i < muros.Count && !colisiona; i++)
                 {
-                    if (new Rectangle(x, y, 40, 40).Intersects(
+                    if (new Rectangle(x, y, d, d).Intersects(
                         new Rectangle(muros[i].X, muros[i].Y, 40, 40)))
                         colisiona = true;
                 }
             }
 
-            if (!colisiona)
+            if (!colisiona && esEnemigo)
             {
                 for(int i = 0; i < bombas.Count && !colisiona; i++)
                 {
-                    if (new Rectangle(x, y, 40, 40).Intersects(
+                    if (new Rectangle(x, y, d, d).Intersects(
                         new Rectangle(bombas[i].X, bombas[i].Y, 40, 40)))
                         colisiona = true;
                 }
@@ -199,9 +199,13 @@ namespace Bomberman
             {
                 for (int i = 0; i < enemigos.Count && !colisiona; i++)
                 {
-                    if (new Rectangle(x, y, 40, 40).Intersects(
+                    if (new Rectangle(x, y, d, d).Intersects(
                         new Rectangle(enemigos[i].X, enemigos[i].Y, 40, 40)))
+                    {
+                        if (d == 30)
+                            Exit();
                         colisiona = true;
+                    }
                 }
             }
 
@@ -297,7 +301,21 @@ namespace Bomberman
                     }
                 }
 
-                if(bombas[i].Contador >= 4)
+                if (bombas[i].GetExplosion().Count > 0)
+                {
+                    foreach (Explosion e in bombas[i].GetExplosion())
+                    {
+                        //Colision de las bombas con los enemigos para matarlos
+                        for (int j = 0; j < enemigos.Count; j++)
+                        {
+                            if (new Rectangle(enemigos[j].X, enemigos[j].Y, 40, 40).Intersects(
+                                new Rectangle(e.X, e.Y, 40, 40)))
+                                enemigos.RemoveAt(j);
+                        }
+                    }
+                }
+
+                if (bombas[i].Contador >= 4)
                     bombas.RemoveAt(i);
             }
 
@@ -321,36 +339,16 @@ namespace Bomberman
             }
 
             //Se comprueban colisiones con las paredes
-            foreach (Obstaculo p in paredes)
+            if(colisiona(jugador.X, jugador.Y, 30))
             {
-                if (new Rectangle(p.X, p.Y, 40, 40).Intersects(
-                    new Rectangle(jugador.X, jugador.Y, 30, 30)))
-                {
-                    if (teclado.IsKeyDown(Keys.W))
-                        jugador.Y += (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
-                    if (teclado.IsKeyDown(Keys.A))
-                        jugador.X += (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
-                    if (teclado.IsKeyDown(Keys.S))
-                        jugador.Y -= (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
-                    if (teclado.IsKeyDown(Keys.D))
-                        jugador.X -= (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
-                }
-            }
-
-            foreach (Obstaculo m in muros)
-            {
-                if (new Rectangle(m.X, m.Y, 40, 40).Intersects(
-                    new Rectangle(jugador.X, jugador.Y, 30, 30)))
-                {
-                    if (teclado.IsKeyDown(Keys.W))
-                        jugador.Y += (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
-                    if (teclado.IsKeyDown(Keys.A))
-                        jugador.X += (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
-                    if (teclado.IsKeyDown(Keys.S))
-                        jugador.Y -= (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
-                    if (teclado.IsKeyDown(Keys.D))
-                        jugador.X -= (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
-                }
+                if (teclado.IsKeyDown(Keys.W))
+                    jugador.Y += (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                if (teclado.IsKeyDown(Keys.A))
+                    jugador.X += (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                if (teclado.IsKeyDown(Keys.S))
+                    jugador.Y -= (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                if (teclado.IsKeyDown(Keys.D))
+                    jugador.X -= (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
             }
 
             //Calcular segundos
