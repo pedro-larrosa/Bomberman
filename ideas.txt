@@ -1,0 +1,3 @@
+-meter el mapa en un fichero de texto
+
+-poder hacer diferentes ficheros para poder elegir diferentes avatares de jugadores

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -12,41 +13,19 @@ namespace Bomberman
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         SpriteFont texto;
+        int nivel;
         double tiempo;
         int longitudBomba;
         static Random r;
 
-        string[] mapa = {
-            "XXXXXXXXXXXXX",
-            "X           X",
-            "X X X X X X X",
-            "X           X",
-            "X X X X X X X",
-            "X           X",
-            "X X X X X X X",
-            "X           X",
-            "X X X X X X X",
-            "X           X",
-            "X X X X X X X",
-            "X           X",
-            "X X X X X X X",
-            "X           X",
-            "X X X X X X X",
-            "X           X",
-            "X X X X X X X",
-            "X           X",
-            "X X X X X X X",
-            "X           X",
-            "X X X X X X X",
-            "X           X",
-            "XXXXXXXXXXXXX"};
+        
         Jugador jugador;
         List<Obstaculo> paredes;
         List<Obstaculo> muros;
         List<Bomba> bombas;
         List<Enemigo> enemigos;
 
-        public Partida()
+        public Partida(int nivel)
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -54,26 +33,47 @@ namespace Bomberman
             graphics.PreferredBackBufferWidth = 920;
             graphics.PreferredBackBufferHeight = 560;
             graphics.ApplyChanges();
+
+            this.nivel = nivel;
         }
 
         private void generarMapa()
         {
             //Se generan paredes
             paredes = new List<Obstaculo>();
-            for (int i = 0; i < mapa.Length; i++)
+            try
             {
-                for (int j = 0; j < mapa[i].Length; j++)
+                StreamReader mapa = new StreamReader("mapa.txt");
+                string linea;
+                int i = 0;
+
+                while((linea = mapa.ReadLine()) != null)
                 {
-                    if (mapa[i][j] == 'X')
-                        paredes.Add(new Obstaculo(i * 40, (j + 1) * 40));
+                    for (int j = 0; j < linea.Length; j++)
+                        if (linea[j] == 'X')
+                            paredes.Add(new Obstaculo(i * 40, (j + 1) * 40));
+
+                    i++;
                 }
+
+                mapa.Close();
+            }catch(FileNotFoundException e)
+            {
+                Console.WriteLine("No se ha encontrado el archivo " + e.FileName + " y no se puede generar un mapa");
+            }catch(ArgumentException e)
+            {
+                Console.WriteLine(e.Message);
+            }catch(IOException e)
+            {
+                Console.WriteLine(e.Message);
             }
+
             //se generan muros
             muros = new List<Obstaculo>();
             int numMuros = 0, x, y;
             r = new Random();
             bool added;
-            while (numMuros < 100)
+            while (numMuros < Math.Min(80, 35 * nivel))
             {
                 x = r.Next(1, 22) * 40;
                 y = r.Next(2, 13) * 40;
@@ -94,6 +94,110 @@ namespace Bomberman
                 }
             }
         }
+
+        private void generarEnemigos()
+        {
+            enemigos = new List<Enemigo>();
+            int x, y, i = 0;
+            r = new Random();
+
+            //Se generan los enemigos de tipo 1. de los que solo habrán en el primer nivel
+            while(i < Math.Min(5, 3 * nivel))
+            {
+                x = r.Next(1, 22) * 40;
+                y = r.Next(2, 13) * 40;
+
+                if(x > 160 || y > 160)
+                {
+                    if (!colisiona(x, y))
+                    {
+                        enemigos.Add(new Enemigo1(x, y));
+                        i++;
+                    }
+                }
+            }
+
+            //Se generan los enemigos de tipo 2. Los cuales apareceran a partir del segundo nivel
+            if(nivel > 1)
+            {
+                i = 0;
+                while (i < 2)
+                {
+                    x = r.Next(1, 22) * 40;
+                    y = r.Next(2, 13) * 40;
+
+                    if (x > 160 || y > 160)
+                    {
+                        if (!colisiona(x, y))
+                        {
+                            enemigos.Add(new Enemigo2(x, y));
+                            i++;
+                        }
+                    }
+                }
+            }
+
+            //Se generan los enemigos de tipo 3. Que apareceran en el 4º nivel
+            i = 0;
+            while(i < Math.Max(0, 1 * (nivel - 3)))
+            {
+                x = r.Next(1, 22) * 40;
+                y = r.Next(2, 13) * 40;
+
+                if(x > 160 || y > 160)
+                {
+                    if (!colisiona(x, y))
+                    {
+                        enemigos.Add(new Enemigo3(x, y));
+                        i++;
+                    }
+                }
+            }
+
+            foreach(Enemigo e in enemigos)
+            {
+                if (e.GetType() == typeof(Enemigo1))
+                    e.SetImagen(Content.Load<Texture2D>("enemigo1"));
+                else if (e.GetType() == typeof(Enemigo2))
+                    e.SetImagen(Content.Load<Texture2D>("enemigo2"));
+                else
+                    e.SetImagen(Content.Load<Texture2D>("enemigo3"));
+            }
+        }
+
+        private bool colisiona(int x, int y, int d = 40)
+        {
+            bool colisiona = false;
+            for(int i = 0; i < paredes.Count && !colisiona; i++)
+            {
+                if (new Rectangle(x, y, 40, 40).Intersects(
+                    new Rectangle(paredes[i].X, paredes[i].Y, 40, 40)))
+                    colisiona = true;
+            }
+
+            if (!colisiona)
+            {
+                for (int i = 0; i < muros.Count && !colisiona; i++)
+                {
+                    if (new Rectangle(x, y, 40, 40).Intersects(
+                        new Rectangle(muros[i].X, muros[i].Y, 40, 40)))
+                        colisiona = true;
+                }
+            }
+
+            if (!colisiona)
+            {
+                for (int i = 0; i < enemigos.Count && !colisiona; i++)
+                {
+                    if (new Rectangle(x, y, 40, 40).Intersects(
+                        new Rectangle(enemigos[i].X, enemigos[i].Y, 40, 40)))
+                        colisiona = true;
+                }
+            }
+
+            return colisiona;
+        }
+
         protected override void Initialize()
         {
             //Inicializamos el jugador
@@ -101,6 +205,9 @@ namespace Bomberman
 
             //se genera el mapa
             generarMapa();
+
+            //Se generan los enemigos
+            generarEnemigos();
 
             //Inicializamos bombas
             bombas = new List<Bomba>();
@@ -233,14 +340,18 @@ namespace Bomberman
             }
             //se dibuja el jugador
             jugador.Dibujar(spriteBatch);
+            
             //Dibujar los muros
             foreach (Obstaculo m in muros)
                 m.Dibujar(spriteBatch);
             //Dibujar las paredes
             foreach (Obstaculo p in paredes)
                 p.Dibujar(spriteBatch);
-            spriteBatch.DrawString(texto, "TIEMPO " + bombas.Count, new Vector2(9, 9), Color.Black);
-            spriteBatch.DrawString(texto, "TIEMPO " + bombas.Count, new Vector2(5, 5), Color.White);
+            //Dibujamos a los enemigos
+            foreach (Enemigo e in enemigos)
+                e.Dibujar(spriteBatch);
+            spriteBatch.DrawString(texto, "TIEMPO " + (int)tiempo, new Vector2(9, 9), Color.Black);
+            spriteBatch.DrawString(texto, "TIEMPO " + (int)tiempo, new Vector2(5, 5), Color.White);
             spriteBatch.End();
             base.Draw(gameTime);
         }
