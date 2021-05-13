@@ -13,10 +13,11 @@ namespace Bomberman
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         SpriteFont texto;
+        static Random r;
         int nivel;
+        int puntuacion;
         double tiempo;
         int longitudBomba;
-        static Random r;
 
         
         Jugador jugador;
@@ -153,16 +154,6 @@ namespace Bomberman
                     }
                 }
             }
-
-            foreach(Enemigo e in enemigos)
-            {
-                if (e.GetType() == typeof(Enemigo1))
-                    e.SetImagen(Content.Load<Texture2D>("enemigo1"));
-                else if (e.GetType() == typeof(Enemigo2))
-                    e.SetImagen(Content.Load<Texture2D>("enemigo2"));
-                else
-                    e.SetImagen(Content.Load<Texture2D>("enemigo3"));
-            }
         }
 
         private bool colisiona(int x, int y, int d = 40, bool esEnemigo = false)
@@ -195,15 +186,13 @@ namespace Bomberman
                 }
             }
 
-            if (!colisiona && !esEnemigo)
+            if (!colisiona && !esEnemigo && d != 30)
             {
                 for (int i = 0; i < enemigos.Count && !colisiona; i++)
                 {
                     if (new Rectangle(x, y, d, d).Intersects(
                         new Rectangle(enemigos[i].X, enemigos[i].Y, 40, 40)))
                     {
-                        if (d == 30)
-                            Exit();
                         colisiona = true;
                     }
                 }
@@ -228,7 +217,8 @@ namespace Bomberman
             generarEnemigos();
 
             //Se inicializa el contador
-            tiempo = 201;
+            tiempo = 101;
+            puntuacion = 0;
             base.Initialize();
         }
 
@@ -244,6 +234,17 @@ namespace Bomberman
             //se cargan las imagenes de los muros
             foreach (Obstaculo m in muros)
                 m.SetImagen(Content.Load<Texture2D>("muro"));
+
+            //se cargan las imagenes de los enemigos
+            foreach (Enemigo e in enemigos)
+            {
+                if (e.GetType() == typeof(Enemigo1))
+                    e.SetImagen(Content.Load<Texture2D>("enemigo1"));
+                else if (e.GetType() == typeof(Enemigo2))
+                    e.SetImagen(Content.Load<Texture2D>("enemigo2"));
+                else
+                    e.SetImagen(Content.Load<Texture2D>("enemigo3"));
+            }
 
             texto = Content.Load<SpriteFont>("texto");
         }
@@ -310,8 +311,15 @@ namespace Bomberman
                         {
                             if (new Rectangle(enemigos[j].X, enemigos[j].Y, 40, 40).Intersects(
                                 new Rectangle(e.X, e.Y, 40, 40)))
+                            {
                                 enemigos.RemoveAt(j);
+                                puntuacion += 100;
+                            }
                         }
+
+                        if (new Rectangle(jugador.X, jugador.Y, 30, 30).Intersects(
+                                new Rectangle(e.X, e.Y, 40, 40)))
+                            Exit();
                     }
                 }
 
@@ -331,10 +339,13 @@ namespace Bomberman
 
                 //Aquí se comprueba si pasa por al lado de un hueco y hay una probabilidad de que cambie de direccion
                 //Para que no entren en bucles
-                if ((e.Y % 80 == 0 && e.GetVelocidadX() == 0 ||
-                    e.X % 40 == 0 && e.X % 80 != 0 && e.GetVelocidadY() == 0) 
+                if(e.GetType() != typeof(Enemigo3))
+                {
+                    if ((e.Y % 80 == 0 && e.GetVelocidadX() == 0 ||
+                    e.X % 40 == 0 && e.X % 80 != 0 && e.GetVelocidadY() == 0)
                     && r.Next(0, 3) == 2)
-                    e.CambiarDireccion();
+                        e.CambiarDireccion();
+                }
 
             }
 
@@ -383,6 +394,8 @@ namespace Bomberman
                 e.Dibujar(spriteBatch);
             spriteBatch.DrawString(texto, "TIEMPO " + (int)tiempo, new Vector2(9, 9), Color.Black);
             spriteBatch.DrawString(texto, "TIEMPO " + (int)tiempo, new Vector2(5, 5), Color.White);
+            spriteBatch.DrawString(texto, "PUNTUACION: " + puntuacion, new Vector2(254, 9), Color.Black);
+            spriteBatch.DrawString(texto, "PUNTUACION: " + puntuacion, new Vector2(250, 5), Color.White);
             spriteBatch.End();
             base.Draw(gameTime);
         }

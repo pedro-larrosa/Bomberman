@@ -12,8 +12,8 @@ namespace Bomberman
 
         public Enemigo(int x, int y, int velocidad) : base(x, y) 
         {
-            this.velocidad = new Vector2(velocidad);
             r = new Random();
+            this.velocidad = r.Next(1, 3) == 1 ? new Vector2(velocidad, 0) : new Vector2(0, velocidad);
         }
 
         public void Mover(GameTime g)

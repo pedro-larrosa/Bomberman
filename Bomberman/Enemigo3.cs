@@ -12,7 +12,8 @@ namespace Bomberman
 
         public override void CambiarDireccion()
         {
-            throw new NotImplementedException();
+            velocidad.X *= -1;
+            velocidad.Y *= -1;
         }
     }
 }
