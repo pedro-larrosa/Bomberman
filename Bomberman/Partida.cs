@@ -18,6 +18,7 @@ namespace Bomberman
         int puntuacion;
         double tiempo;
         int longitudBomba;
+        bool muerto;
 
         
         Jugador jugador;
@@ -30,12 +31,17 @@ namespace Bomberman
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+            IsMouseVisible = false;
             graphics.PreferredBackBufferWidth = 920;
             graphics.PreferredBackBufferHeight = 560;
             graphics.ApplyChanges();
 
             this.nivel = nivel;
+        }
+
+        public bool JugadorMuerto()
+        {
+            return muerto;
         }
 
         private void generarMapa()
@@ -219,6 +225,7 @@ namespace Bomberman
             //Se inicializa el contador
             tiempo = 101;
             puntuacion = 0;
+            muerto = false;
             base.Initialize();
         }
 
@@ -319,7 +326,10 @@ namespace Bomberman
 
                         if (new Rectangle(jugador.X, jugador.Y, 30, 30).Intersects(
                                 new Rectangle(e.X, e.Y, 40, 40)))
+                        {
+                            muerto = true;
                             Exit();
+                        }
                     }
                 }
 
@@ -396,6 +406,8 @@ namespace Bomberman
             spriteBatch.DrawString(texto, "TIEMPO " + (int)tiempo, new Vector2(5, 5), Color.White);
             spriteBatch.DrawString(texto, "PUNTUACION: " + puntuacion, new Vector2(254, 9), Color.Black);
             spriteBatch.DrawString(texto, "PUNTUACION: " + puntuacion, new Vector2(250, 5), Color.White);
+            spriteBatch.DrawString(texto, "NIVEL " + nivel, new Vector2(754, 9), Color.Black);
+            spriteBatch.DrawString(texto, "NIVEL " + nivel, new Vector2(750, 5), Color.White);
             spriteBatch.End();
             base.Draw(gameTime);
         }

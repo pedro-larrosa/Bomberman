@@ -4,11 +4,35 @@ namespace Bomberman
 {
     public static class Program
     {
-        [STAThread]
+        
         static void Main()
         {
-            using (var game = new Partida(4))
-                game.Run();
+            Inicio inicio;
+            int o = 0;
+
+            while(o != -1)
+            {
+                inicio = new Inicio();
+                inicio.Run();
+                o = inicio.GetOpcion();
+
+                switch (o)
+                {
+                    case 1:
+                        Partida partida;
+                        int i = 1;
+                        Console.WriteLine("Introduce tu nombre:");
+                        string nombre = Console.ReadLine();
+                        do
+                        {
+                            partida = new Partida(i++);
+                            partida.Run();
+                        } while (i <= 5 && !partida.JugadorMuerto());
+                        break;
+                }
+
+                
+            }
         }
     }
 }
