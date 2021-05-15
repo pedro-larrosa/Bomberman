@@ -24,10 +24,12 @@ namespace Bomberman
         Jugador jugador;
         List<Obstaculo> paredes;
         List<Obstaculo> muros;
+        Obstaculo salida;
+        Obstaculo mejora;
         List<Bomba> bombas;
         List<Enemigo> enemigos;
 
-        public Partida(int nivel)
+        public Partida(int nivel, int longitudBomba)
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -37,11 +39,17 @@ namespace Bomberman
             graphics.ApplyChanges();
 
             this.nivel = nivel;
+            this.longitudBomba = longitudBomba;
         }
 
         public bool JugadorMuerto()
         {
             return muerto;
+        }
+
+        public int GetLongitudBomba()
+        {
+            return longitudBomba;
         }
 
         private void generarMapa()
@@ -98,6 +106,31 @@ namespace Bomberman
                             added = true;
                         }
                     }
+                }
+            }
+
+            //Se genera la puerta de salida
+            bool generado = false;
+            while (!generado)
+            {
+                for (int i = 0; i < muros.Count && !generado; i++)
+                {
+                    if (r.Next(1, 6) == 3)
+                    {
+                        salida = new Obstaculo(muros[i].X, muros[i].Y);
+                        generado = true;
+                    }
+                }
+            }
+
+            //Se genera la mejora de las bombas(o no, es una posibilidad)
+            generado = false;
+            for (int i = 0; i < muros.Count && !generado; i++)
+            {
+                if (r.Next(1, 17 - nivel) == 3)
+                {
+                    mejora = new Obstaculo(muros[i].X, muros[i].Y);
+                    generado = true;
                 }
             }
         }
@@ -241,7 +274,10 @@ namespace Bomberman
             //se cargan las imagenes de los muros
             foreach (Obstaculo m in muros)
                 m.SetImagen(Content.Load<Texture2D>("muro"));
-
+            //Se carga la puerta y la mejora si la hubiera
+            salida.SetImagen(Content.Load<Texture2D>("puerta"));
+            if (mejora != null)
+                mejora.SetImagen(Content.Load<Texture2D>("mejora"));
             //se cargan las imagenes de los enemigos
             foreach (Enemigo e in enemigos)
             {
@@ -259,7 +295,10 @@ namespace Bomberman
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
+                muerto = true;
                 Exit();
+            }
 
             KeyboardState teclado = Keyboard.GetState();
 
@@ -375,6 +414,17 @@ namespace Bomberman
             //Calcular segundos
             if (tiempo > 0)
                 tiempo -= gameTime.ElapsedGameTime.TotalSeconds;
+            //Salida de la puerta
+            if (new Rectangle(salida.X + 10, salida.Y + 10, 20, 20).Intersects(
+                new Rectangle(jugador.X, jugador.Y, 30, 30)) && enemigos.Count == 0)
+                Exit();
+            if (mejora != null && new Rectangle(mejora.X + 10, mejora.Y + 10, 20, 20).Intersects(
+                new Rectangle(jugador.X, jugador.Y, 30, 30)))
+            {
+                mejora = null;
+                longitudBomba += 1;
+            }
+
             base.Update(gameTime);
         }
 
@@ -390,6 +440,10 @@ namespace Bomberman
                 foreach (Explosion e in b.GetExplosion())
                     e.Dibujar(spriteBatch);
             }
+            //Dibujamos la puerta y la mejora si la hubiera
+            salida.Dibujar(spriteBatch);
+            if (mejora != null)
+                mejora.Dibujar(spriteBatch);
             //se dibuja el jugador
             jugador.Dibujar(spriteBatch);
             

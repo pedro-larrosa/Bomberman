@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Threading;
 
 namespace Bomberman
 {
     public static class Program
     {
-        
+        [STAThread]
         static void Main()
         {
             Inicio inicio;
@@ -21,12 +22,12 @@ namespace Bomberman
                     case 1:
                         Partida partida;
                         int i = 1;
-                        Console.WriteLine("Introduce tu nombre:");
-                        string nombre = Console.ReadLine();
+                        int l = 1;
                         do
                         {
-                            partida = new Partida(i++);
+                            partida = new Partida(i++, l);
                             partida.Run();
+                            l = partida.GetLongitudBomba();
                         } while (i <= 5 && !partida.JugadorMuerto());
                         break;
                 }
