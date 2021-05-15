@@ -19,6 +19,7 @@ namespace Bomberman
         double tiempo;
         int longitudBomba;
         bool muerto;
+        bool final;
 
         
         Jugador jugador;
@@ -29,7 +30,7 @@ namespace Bomberman
         List<Bomba> bombas;
         List<Enemigo> enemigos;
 
-        public Partida(int nivel, int longitudBomba)
+        public Partida(int nivel, int longitudBomba, int puntuacion)
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -40,6 +41,7 @@ namespace Bomberman
 
             this.nivel = nivel;
             this.longitudBomba = longitudBomba;
+            this.puntuacion = puntuacion;
         }
 
         public bool JugadorMuerto()
@@ -50,6 +52,11 @@ namespace Bomberman
         public int GetLongitudBomba()
         {
             return longitudBomba;
+        }
+
+        public int GetPuntuacion()
+        {
+            return puntuacion;
         }
 
         private void generarMapa()
@@ -195,6 +202,35 @@ namespace Bomberman
             }
         }
 
+        private void enemigosFinales()
+        {
+            final = true;
+            int i, x, y;
+            for (i = 0; i < enemigos.Count; i++)
+            {
+                enemigos[i] = new EnemigoFinal(enemigos[i].X, enemigos[i].Y);
+            }
+
+            i = 0;
+            while (i < 5)
+            {
+                x = r.Next(1, 22) * 40;
+                y = r.Next(2, 13) * 40;
+
+                if (x > jugador.X * 2 || y > jugador.Y * 2)
+                {
+                    if (!colisiona(x, y))
+                    {
+                        enemigos.Add(new EnemigoFinal(x, y));
+                        i++;
+                    }
+                }
+            }
+
+            foreach (Enemigo e in enemigos)
+                e.SetImagen(Content.Load<Texture2D>("enemigoFinal"));
+        }
+
         private bool colisiona(int x, int y, int d = 40, bool esEnemigo = false)
         {
             bool colisiona = false;
@@ -257,8 +293,8 @@ namespace Bomberman
 
             //Se inicializa el contador
             tiempo = 101;
-            puntuacion = 0;
             muerto = false;
+            final = false;
             base.Initialize();
         }
 
@@ -358,8 +394,9 @@ namespace Bomberman
                             if (new Rectangle(enemigos[j].X, enemigos[j].Y, 40, 40).Intersects(
                                 new Rectangle(e.X, e.Y, 40, 40)))
                             {
+                                puntuacion += enemigos[i].GetType() == typeof(EnemigoFinal) ?
+                                    300 : 100;
                                 enemigos.RemoveAt(j);
-                                puntuacion += 100;
                             }
                         }
 
@@ -414,14 +451,22 @@ namespace Bomberman
             //Calcular segundos
             if (tiempo > 0)
                 tiempo -= gameTime.ElapsedGameTime.TotalSeconds;
+            else if(!final)
+                enemigosFinales();
+
             //Salida de la puerta
             if (new Rectangle(salida.X + 10, salida.Y + 10, 20, 20).Intersects(
                 new Rectangle(jugador.X, jugador.Y, 30, 30)) && enemigos.Count == 0)
+            {
+                puntuacion += 10000;
                 Exit();
+            }
+            //Colision con la mejora
             if (mejora != null && new Rectangle(mejora.X + 10, mejora.Y + 10, 20, 20).Intersects(
                 new Rectangle(jugador.X, jugador.Y, 30, 30)))
             {
                 mejora = null;
+                puntuacion += 1000;
                 longitudBomba += 1;
             }
 

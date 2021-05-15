@@ -21,13 +21,14 @@ namespace Bomberman
                 {
                     case 1:
                         Partida partida;
-                        int i = 1;
-                        int l = 1;
+                        int i = 1, l = 1, p = 0;
+
                         do
                         {
-                            partida = new Partida(i++, l);
+                            partida = new Partida(i++, l, p);
                             partida.Run();
                             l = partida.GetLongitudBomba();
+                            p = partida.GetPuntuacion();
                         } while (i <= 5 && !partida.JugadorMuerto());
                         break;
                 }
