@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Bomberman
 {
-    class Usuario
+    class Usuario : IComparable<Usuario>
     {
         string nombre;
         int puntuacion;
@@ -15,6 +15,31 @@ namespace Bomberman
             this.nombre = nombre;
             this.puntuacion = puntuacion;
             this.fecha = fecha;
+        }
+
+        public int CompareTo(Usuario u2)
+        {
+            if (puntuacion > u2.GetPuntuacion())
+                return -1;
+            else if (puntuacion < u2.GetPuntuacion())
+                return 1;
+            else
+                return 0;
+        }
+
+        public string GetNombre()
+        {
+            return nombre;
+        }
+
+        public int GetPuntuacion()
+        {
+            return puntuacion;
+        }
+
+        public DateTime GetFecha()
+        {
+            return fecha;
         }
     }
 }

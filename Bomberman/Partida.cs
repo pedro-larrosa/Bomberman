@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -20,6 +21,8 @@ namespace Bomberman
         int longitudBomba;
         bool muerto;
         bool final;
+        bool pausado;
+        bool pulsada;
 
         
         Jugador jugador;
@@ -57,6 +60,11 @@ namespace Bomberman
         public int GetPuntuacion()
         {
             return puntuacion;
+        }
+
+        public bool GetPausado()
+        {
+            return pausado;
         }
 
         private void generarMapa()
@@ -295,6 +303,7 @@ namespace Bomberman
             tiempo = 101;
             muerto = false;
             final = false;
+            pausado = false;
             base.Initialize();
         }
 
@@ -330,144 +339,156 @@ namespace Bomberman
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-            {
-                muerto = true;
-                Exit();
-            }
-
             KeyboardState teclado = Keyboard.GetState();
 
-            //Colocar bomba
-            Bomba bAux;
-            if (teclado.IsKeyDown(Keys.E))
+            //Pausa
+            if (teclado.IsKeyDown(Keys.P) && !pulsada)
+                pausado = pausado ? false : true;
+            pulsada = teclado.IsKeyDown(Keys.P) ? true : false;
+
+            if (pausado)
             {
-                bAux = new Bomba(jugador.X - (jugador.X % 40), jugador.Y - (jugador.Y % 40), longitudBomba);
-                //He cambiado el .Equals() para que compare solo las posiciones X e Y
-                if (!bombas.Contains(bAux))
+                if (teclado.IsKeyDown(Keys.Escape))
                 {
-                    bAux.SetImagen(Content.Load<Texture2D>("bomba"));
-                    bombas.Add(bAux);
+                    muerto = true;
+                    Exit();
                 }
             }
 
-            //Movimiento jugador
-            if (teclado.IsKeyDown(Keys.W))
-                jugador.Y -= (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
-            if (teclado.IsKeyDown(Keys.A))
-                jugador.X -= (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
-            if (teclado.IsKeyDown(Keys.S))
-                jugador.Y += (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
-            if (teclado.IsKeyDown(Keys.D))
-                jugador.X += (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
 
-            //Se mueven los enemigos
-            foreach (Enemigo e in enemigos)
-                e.Mover(gameTime);
-            
-            //HACER FUNCIONAMIENTO DE LAS BOMBAS
-            for(int i = 0; i < bombas.Count; i++)
+            if (!pausado)
             {
-                if ((int)(bombas[i].Contador += gameTime.ElapsedGameTime.TotalSeconds) == 2 && !bombas[i].HaExplotado())
+                //Colocar bomba
+                Bomba bAux;
+                if (teclado.IsKeyDown(Keys.E))
                 {
-                    bombas[i].Explotar(paredes, muros);
-                    foreach (Explosion e in bombas[i].GetExplosion())
+                    bAux = new Bomba(jugador.X - (jugador.X % 40), jugador.Y - (jugador.Y % 40), longitudBomba);
+                    //He cambiado el .Equals() para que compare solo las posiciones X e Y
+                    if (!bombas.Contains(bAux))
                     {
-                        e.SetImagen(Content.Load<Texture2D>("explosion"));
-                        //Colisiones de las explosiones con los muros para destruirlos
-                        for (int j = 0; j < muros.Count; j++)
-                        {
-                            if (new Rectangle(muros[j].X, muros[j].Y, 40, 40).Intersects(
-                                new Rectangle(e.X, e.Y, 40, 40)))
-                                muros.RemoveAt(j);
-                        }
+                        bAux.SetImagen(Content.Load<Texture2D>("bomba"));
+                        bombas.Add(bAux);
                     }
                 }
 
-                if (bombas[i].GetExplosion().Count > 0)
+                //Movimiento jugador
+                if (teclado.IsKeyDown(Keys.W))
+                    jugador.Y -= (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                if (teclado.IsKeyDown(Keys.A))
+                    jugador.X -= (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                if (teclado.IsKeyDown(Keys.S))
+                    jugador.Y += (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                if (teclado.IsKeyDown(Keys.D))
+                    jugador.X += (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+
+                //Se mueven los enemigos
+                foreach (Enemigo e in enemigos)
+                    e.Mover(gameTime);
+
+                //HACER FUNCIONAMIENTO DE LAS BOMBAS
+                for (int i = 0; i < bombas.Count; i++)
                 {
-                    foreach (Explosion e in bombas[i].GetExplosion())
+                    if ((int)(bombas[i].Contador += gameTime.ElapsedGameTime.TotalSeconds) == 2 && !bombas[i].HaExplotado())
                     {
-                        //Colision de las bombas con los enemigos para matarlos
-                        for (int j = 0; j < enemigos.Count; j++)
+                        bombas[i].Explotar(paredes, muros);
+                        foreach (Explosion e in bombas[i].GetExplosion())
                         {
-                            if (new Rectangle(enemigos[j].X, enemigos[j].Y, 40, 40).Intersects(
-                                new Rectangle(e.X, e.Y, 40, 40)))
+                            e.SetImagen(Content.Load<Texture2D>("explosion"));
+                            //Colisiones de las explosiones con los muros para destruirlos
+                            for (int j = 0; j < muros.Count; j++)
                             {
-                                puntuacion += enemigos[i].GetType() == typeof(EnemigoFinal) ?
-                                    300 : 100;
-                                enemigos.RemoveAt(j);
+                                if (new Rectangle(muros[j].X, muros[j].Y, 40, 40).Intersects(
+                                    new Rectangle(e.X, e.Y, 40, 40)))
+                                    muros.RemoveAt(j);
                             }
                         }
+                    }
 
-                        if (new Rectangle(jugador.X, jugador.Y, 30, 30).Intersects(
-                                new Rectangle(e.X, e.Y, 40, 40)))
+                    if (bombas[i].GetExplosion().Count > 0)
+                    {
+                        foreach (Explosion e in bombas[i].GetExplosion())
                         {
-                            muerto = true;
-                            Exit();
+                            //Colision de las bombas con los enemigos para matarlos
+                            for (int j = 0; j < enemigos.Count; j++)
+                            {
+                                if (new Rectangle(enemigos[j].X, enemigos[j].Y, 40, 40).Intersects(
+                                    new Rectangle(e.X, e.Y, 40, 40)))
+                                {
+                                    puntuacion += enemigos[i].GetType() == typeof(EnemigoFinal) ?
+                                        300 : 100;
+                                    enemigos.RemoveAt(j);
+                                }
+                            }
+
+                            if (new Rectangle(jugador.X, jugador.Y, 30, 30).Intersects(
+                                    new Rectangle(e.X, e.Y, 40, 40)))
+                            {
+                                muerto = true;
+                                Exit();
+                            }
                         }
                     }
+
+                    if (bombas[i].Contador >= 4)
+                        bombas.RemoveAt(i);
                 }
 
-                if (bombas[i].Contador >= 4)
-                    bombas.RemoveAt(i);
-            }
-
-            //Se comprueban colisiones con enemigos
-            foreach(Enemigo e in enemigos)
-            {
-                if(colisiona(e.X, e.Y, 40,true))
+                //Se comprueban colisiones con enemigos
+                foreach (Enemigo e in enemigos)
                 {
-                    e.X -= (int)(e.GetVelocidadX() * (float)gameTime.ElapsedGameTime.TotalSeconds);
-                    e.Y -= (int)(e.GetVelocidadY() * (float)gameTime.ElapsedGameTime.TotalSeconds);
-                    e.CambiarDireccion();
-                }
-
-                //Aquí se comprueba si pasa por al lado de un hueco y hay una probabilidad de que cambie de direccion
-                //Para que no entren en bucles
-                if(e.GetType() != typeof(Enemigo3))
-                {
-                    if ((e.Y % 80 == 0 && e.GetVelocidadX() == 0 ||
-                    e.X % 40 == 0 && e.X % 80 != 0 && e.GetVelocidadY() == 0)
-                    && r.Next(0, 3) == 2)
+                    if (colisiona(e.X, e.Y, 40, true))
+                    {
+                        e.X -= (int)(e.GetVelocidadX() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                        e.Y -= (int)(e.GetVelocidadY() * (float)gameTime.ElapsedGameTime.TotalSeconds);
                         e.CambiarDireccion();
+                    }
+
+                    //Aquí se comprueba si pasa por al lado de un hueco y hay una probabilidad de que cambie de direccion
+                    //Para que no entren en bucles
+                    if (e.GetType() != typeof(Enemigo3))
+                    {
+                        if ((e.Y % 80 == 0 && e.GetVelocidadX() == 0 ||
+                        e.X % 40 == 0 && e.X % 80 != 0 && e.GetVelocidadY() == 0)
+                        && r.Next(0, 3) == 2)
+                            e.CambiarDireccion();
+                    }
+
                 }
 
-            }
+                //Se comprueban colisiones con las paredes
+                if (colisiona(jugador.X, jugador.Y, 30))
+                {
+                    if (teclado.IsKeyDown(Keys.W))
+                        jugador.Y += (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                    if (teclado.IsKeyDown(Keys.A))
+                        jugador.X += (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                    if (teclado.IsKeyDown(Keys.S))
+                        jugador.Y -= (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                    if (teclado.IsKeyDown(Keys.D))
+                        jugador.X -= (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                }
 
-            //Se comprueban colisiones con las paredes
-            if(colisiona(jugador.X, jugador.Y, 30))
-            {
-                if (teclado.IsKeyDown(Keys.W))
-                    jugador.Y += (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
-                if (teclado.IsKeyDown(Keys.A))
-                    jugador.X += (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
-                if (teclado.IsKeyDown(Keys.S))
-                    jugador.Y -= (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
-                if (teclado.IsKeyDown(Keys.D))
-                    jugador.X -= (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
-            }
+                //Calcular segundos
+                if (tiempo > 0)
+                    tiempo -= gameTime.ElapsedGameTime.TotalSeconds;
+                else if (!final)
+                    enemigosFinales();
 
-            //Calcular segundos
-            if (tiempo > 0)
-                tiempo -= gameTime.ElapsedGameTime.TotalSeconds;
-            else if(!final)
-                enemigosFinales();
-
-            //Salida de la puerta
-            if (new Rectangle(salida.X + 10, salida.Y + 10, 20, 20).Intersects(
-                new Rectangle(jugador.X, jugador.Y, 30, 30)) && enemigos.Count == 0)
-            {
-                puntuacion += 10000;
-                Exit();
-            }
-            //Colision con la mejora
-            if (mejora != null && new Rectangle(mejora.X + 10, mejora.Y + 10, 20, 20).Intersects(
-                new Rectangle(jugador.X, jugador.Y, 30, 30)))
-            {
-                mejora = null;
-                puntuacion += 1000;
-                longitudBomba += 1;
+                //Salida de la puerta
+                if (new Rectangle(salida.X + 10, salida.Y + 10, 20, 20).Intersects(
+                    new Rectangle(jugador.X, jugador.Y, 30, 30)) && enemigos.Count == 0)
+                {
+                    puntuacion += 10000;
+                    Exit();
+                }
+                //Colision con la mejora
+                if (mejora != null && new Rectangle(mejora.X + 10, mejora.Y + 10, 20, 20).Intersects(
+                    new Rectangle(jugador.X, jugador.Y, 30, 30)))
+                {
+                    mejora = null;
+                    puntuacion += 1000;
+                    longitudBomba += 1;
+                }
             }
 
             base.Update(gameTime);
@@ -507,6 +528,11 @@ namespace Bomberman
             spriteBatch.DrawString(texto, "PUNTUACION: " + puntuacion, new Vector2(250, 5), Color.White);
             spriteBatch.DrawString(texto, "NIVEL " + nivel, new Vector2(754, 9), Color.Black);
             spriteBatch.DrawString(texto, "NIVEL " + nivel, new Vector2(750, 5), Color.White);
+            if(pausado)
+            {
+                spriteBatch.DrawString(texto, "PAUSADO", new Vector2(920 / 2 - 50, 560 / 2 - 30), Color.Red);
+                spriteBatch.DrawString(texto, "Pulsa Esc para salir", new Vector2(920 / 2 - 100, 560 / 2), Color.Red);
+            }
             spriteBatch.End();
             base.Draw(gameTime);
         }

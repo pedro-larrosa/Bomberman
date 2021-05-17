@@ -1,20 +1,24 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace Bomberman
 {
-    public class Inicio : Game
+    class PedirNombre : Game
     {
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
-        Texture2D imagen;
         SpriteFont texto;
-        Vector2 posicionImagen;
-        int opcion;
+        string nombre;
+        char teclaP;
+        bool pulsada;
 
 
-        public Inicio()
+        public PedirNombre()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -22,25 +26,23 @@ namespace Bomberman
             graphics.PreferredBackBufferWidth = 920;
             graphics.PreferredBackBufferHeight = 560;
             graphics.ApplyChanges();
-            opcion = -1;
         }
 
-        public int GetOpcion()
+        public string GetNombre()
         {
-            return opcion;
+            return nombre;
         }
 
         protected override void Initialize()
         {
-            posicionImagen = new Vector2(320, 50);
-
+            pulsada = false;
+            nombre = "";
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            imagen = Content.Load<Texture2D>("bomberman");
             texto = Content.Load<SpriteFont>("texto");
         }
 
@@ -49,27 +51,19 @@ namespace Bomberman
             KeyboardState tecla = Keyboard.GetState();
 
             if (tecla.IsKeyDown(Keys.Escape))
-            {
-                opcion = -1;
                 Exit();
-            }
 
-            if (tecla.IsKeyDown(Keys.Enter))
-            {
-                opcion = 1;
-                Exit();
-            }
+            if (tecla.IsKeyDown(Keys.Back) && !pulsada)
+                if(nombre.Length > 0)
+                    nombre = nombre.Remove(nombre.Length - 1);
+            pulsada = tecla.IsKeyDown(Keys.Back) ? true : false;
 
-            if (tecla.IsKeyDown(Keys.M))
+            if (tecla.GetPressedKeys().Length > 0 && tecla.GetPressedKeys()[0] >= Keys.A && tecla.GetPressedKeys()[0] <= Keys.Z)
             {
-                opcion = 2;
-                Exit();
-            }
+                if (!tecla.IsKeyDown((Keys)teclaP))
+                    nombre += Convert.ToChar(tecla.GetPressedKeys()[0]).ToString();
 
-            if (tecla.IsKeyDown(Keys.P))
-            {
-                opcion = 3;
-                Exit();
+                teclaP = Convert.ToChar(tecla.GetPressedKeys()[0]);
             }
 
             base.Update(gameTime);
@@ -80,10 +74,8 @@ namespace Bomberman
             GraphicsDevice.Clear(Color.Black);
 
             spriteBatch.Begin();
-            spriteBatch.Draw(imagen, new Rectangle((int) posicionImagen.X, (int) posicionImagen.Y, imagen.Width, imagen.Height), Color.White);
-            spriteBatch.DrawString(texto, "Enter: 1 Jugador", new Vector2(350, 250), Color.White);
-            spriteBatch.DrawString(texto, "M: Multijugador", new Vector2(350, 280), Color.White);
-            spriteBatch.DrawString(texto, "P: Pantalla de puntuaciones", new Vector2(280, 310), Color.White);
+            spriteBatch.DrawString(texto, "Introduce tu nombre:" + nombre, new Vector2(250, 250), Color.White);
+            spriteBatch.DrawString(texto, "Pulsa Esc para confirmar", new Vector2(270, 280), Color.White);
             spriteBatch.End();
             // TODO: Add your drawing code here
 
