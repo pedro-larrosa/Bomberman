@@ -102,24 +102,25 @@ namespace Bomberman
             muros = new List<Obstaculo>();
             int numMuros = 0, x, y;
             r = new Random();
-            bool added;
+            bool coinciden;
             while (numMuros < Math.Min(80, 35 * nivel))
             {
                 x = r.Next(1, 22) * 40;
                 y = r.Next(2, 13) * 40;
-                added = false;
+                coinciden = false;
 
                 if (x > 160 || y > 160)
                 {
-                    for (int i = 0; i < paredes.Count && !added; i++)
+                    for (int i = 0; i < paredes.Count && !coinciden; i++)
                     {
-                        if (!new Rectangle(paredes[i].X, paredes[i].Y, 40, 40).Intersects(
-                            new Rectangle(x, y, 40, 40)))
-                        {
-                            muros.Add(new Obstaculo(x, y));
-                            numMuros++;
-                            added = true;
-                        }
+                        if (paredes[i].X == x && paredes[i].Y == y)
+                            coinciden = true;
+                    }
+
+                    if (!coinciden)
+                    {
+                        muros.Add(new Obstaculo(x, y));
+                        numMuros++;
                     }
                 }
             }
@@ -142,11 +143,14 @@ namespace Bomberman
             generado = false;
             for (int i = 0; i < muros.Count && !generado; i++)
             {
-                if (r.Next(1, 17 - nivel) == 3)
+                if (r.Next(1, 51 - nivel) == 3)
                 {
-                    mejora = new Obstaculo(muros[i].X, muros[i].Y);
-                    generado = true;
-                }
+                    if (muros[i].X != salida.X && muros[i].Y != salida.Y)
+                    {
+                        mejora = new Obstaculo(muros[i].X, muros[i].Y);
+                        generado = true;
+                    }
+                }   
             }
         }
 
@@ -345,7 +349,7 @@ namespace Bomberman
             if (teclado.IsKeyDown(Keys.P) && !pulsada)
                 pausado = pausado ? false : true;
             pulsada = teclado.IsKeyDown(Keys.P) ? true : false;
-
+            
             if (pausado)
             {
                 if (teclado.IsKeyDown(Keys.Escape))
@@ -433,7 +437,7 @@ namespace Bomberman
                         bombas.RemoveAt(i);
                 }
 
-                //Se comprueban colisiones con enemigos
+                //Se comprueban colisiones de los enemigos
                 foreach (Enemigo e in enemigos)
                 {
                     if (colisiona(e.X, e.Y, 40, true))
@@ -451,6 +455,17 @@ namespace Bomberman
                         e.X % 40 == 0 && e.X % 80 != 0 && e.GetVelocidadY() == 0)
                         && r.Next(0, 3) == 2)
                             e.CambiarDireccion();
+                    }
+
+                    //Si el enemigo final te toca mueres
+                    if(e.GetType() == typeof(EnemigoFinal))
+                    {
+                        if (new Rectangle(e.X, e.Y, 40, 40).Intersects(
+                        new Rectangle(jugador.X, jugador.Y, 30, 30)))
+                        {
+                            muerto = true;
+                            Exit();
+                        }
                     }
 
                 }
@@ -512,7 +527,6 @@ namespace Bomberman
                 mejora.Dibujar(spriteBatch);
             //se dibuja el jugador
             jugador.Dibujar(spriteBatch);
-            
             //Dibujar los muros
             foreach (Obstaculo m in muros)
                 m.Dibujar(spriteBatch);

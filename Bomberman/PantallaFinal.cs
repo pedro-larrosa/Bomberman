@@ -21,7 +21,7 @@ namespace Bomberman
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            IsMouseVisible = false;
+            IsMouseVisible = true;
             graphics.PreferredBackBufferWidth = 920;
             graphics.PreferredBackBufferHeight = 560;
             graphics.ApplyChanges();

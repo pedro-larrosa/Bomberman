@@ -18,7 +18,7 @@ namespace Bomberman
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            IsMouseVisible = false;
+            IsMouseVisible = true;
             graphics.PreferredBackBufferWidth = 920;
             graphics.PreferredBackBufferHeight = 560;
             graphics.ApplyChanges();
@@ -84,6 +84,7 @@ namespace Bomberman
             spriteBatch.DrawString(texto, "Enter: 1 Jugador", new Vector2(350, 250), Color.White);
             spriteBatch.DrawString(texto, "M: Multijugador", new Vector2(350, 280), Color.White);
             spriteBatch.DrawString(texto, "P: Pantalla de puntuaciones", new Vector2(280, 310), Color.White);
+            spriteBatch.DrawString(texto, "Esc: Salir", new Vector2(380, 340), Color.White);
             spriteBatch.End();
             // TODO: Add your drawing code here
 

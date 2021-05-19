@@ -20,7 +20,7 @@ namespace Bomberman
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            IsMouseVisible = false;
+            IsMouseVisible = true;
             graphics.PreferredBackBufferWidth = 920;
             graphics.PreferredBackBufferHeight = 560;
             graphics.ApplyChanges();
@@ -78,11 +78,17 @@ namespace Bomberman
             {
                 if(i <= 10)
                 {
-                    spriteBatch.DrawString(texto, i + ". " + p.Key + "-" + p.Value.GetPuntuacion() + " pts. - " + p.Value.GetFecha().ToString("d"), new Vector2(280, 10 + (i * 30)), Color.White);
+                    spriteBatch.DrawString(texto, i + ". " + p.Key + " - " + p.Value.GetPuntuacion() + " pts. - " + p.Value.GetFecha().ToString("d"), new Vector2(230, 10 + (i * 30)), Color.White);
                 }
                 i++;
             }
-                spriteBatch.End();
+
+            for(i = i; i <= 10; i++)
+            {
+                spriteBatch.DrawString(texto, i + ". XXX - 0 pts. - XX", new Vector2(230, 10 + (i * 30)), Color.White);
+            }
+            spriteBatch.DrawString(texto, "Pulsa Enter para salir", new Vector2(280, 10 + (11 * 30)), Color.White);
+            spriteBatch.End();
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);

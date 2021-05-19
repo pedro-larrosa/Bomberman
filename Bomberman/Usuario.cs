@@ -19,12 +19,8 @@ namespace Bomberman
 
         public int CompareTo(Usuario u2)
         {
-            if (puntuacion > u2.GetPuntuacion())
-                return -1;
-            else if (puntuacion < u2.GetPuntuacion())
-                return 1;
-            else
-                return 0;
+            return puntuacion > u2.GetPuntuacion() ? -1 : 
+                puntuacion < u2.GetPuntuacion() ? 1 : 0;
         }
 
         public string GetNombre()
