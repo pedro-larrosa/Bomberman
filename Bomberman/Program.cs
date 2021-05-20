@@ -65,6 +65,7 @@ namespace Bomberman
                         }
                         break;
                     case 2:
+                        new PartidaMultijugador().Run();
                         break;
                     case 3:
                         new PantallaPuntuaciones().Run();

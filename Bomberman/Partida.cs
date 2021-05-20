@@ -14,11 +14,11 @@ namespace Bomberman
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         SpriteFont texto;
+        Texture2D fondoGris;
         static Random r;
         int nivel;
         int puntuacion;
         double tiempo;
-        int longitudBomba;
         bool muerto;
         bool final;
         bool pausado;
@@ -43,7 +43,8 @@ namespace Bomberman
             graphics.ApplyChanges();
 
             this.nivel = nivel;
-            this.longitudBomba = longitudBomba;
+            //Inicializamos el jugador
+            jugador = new Jugador(40, 80, longitudBomba);
             this.puntuacion = puntuacion;
         }
 
@@ -54,7 +55,7 @@ namespace Bomberman
 
         public int GetLongitudBomba()
         {
-            return longitudBomba;
+            return jugador.LongitudBomba;
         }
 
         public int GetPuntuacion()
@@ -290,9 +291,6 @@ namespace Bomberman
 
         protected override void Initialize()
         {
-            //Inicializamos el jugador
-            jugador = new Jugador(40, 80);
-
             //Inicializamos bombas
             bombas = new List<Bomba>();
 
@@ -338,6 +336,7 @@ namespace Bomberman
             }
 
             texto = Content.Load<SpriteFont>("texto");
+            fondoGris = Content.Load<Texture2D>("gris");
         }
 
         protected override void Update(GameTime gameTime)
@@ -359,7 +358,7 @@ namespace Bomberman
                 //Colocar bomba
                 if (teclado.IsKeyDown(Keys.E))
                 {
-                    Bomba bAux = new Bomba(jugador.X - (jugador.X % 40), jugador.Y - (jugador.Y % 40), longitudBomba);
+                    Bomba bAux = new Bomba(jugador.X - (jugador.X % 40), jugador.Y - (jugador.Y % 40), jugador.LongitudBomba);
                     //He cambiado el .Equals() para que compare solo las posiciones X e Y
                     if (!bombas.Contains(bAux))
                     {
@@ -453,7 +452,7 @@ namespace Bomberman
                         if (new Rectangle(e.X, e.Y, 40, 40).Intersects(
                         new Rectangle(jugador.X, jugador.Y, 30, 30)))
                         {
-                            Thread.Sleep(3000);
+                            Thread.Sleep(1500);
                             Exit();
                         }
                     }
@@ -493,7 +492,7 @@ namespace Bomberman
                 {
                     mejora = null;
                     puntuacion += 1000;
-                    longitudBomba += 1;
+                    jugador.LongitudBomba += 1;
                 }
             }
 
@@ -505,6 +504,7 @@ namespace Bomberman
             GraphicsDevice.Clear(Color.Green);
 
             spriteBatch.Begin();
+            spriteBatch.Draw(fondoGris, new Rectangle(0, 0, 920, 40), Color.White);
             //Dibujar bombas
             foreach (Bomba b in bombas)
             {

@@ -10,10 +10,12 @@ namespace Bomberman
     class Jugador : Sprite
     {
         int velocidad;
+        int longitudBomba;
 
-        public Jugador(int x, int y) : base(x, y)
+        public Jugador(int x, int y, int longitudBomba) : base(x, y)
         {
             velocidad = 120;
+            this.longitudBomba = longitudBomba;
         }
 
         new public void Dibujar(SpriteBatch s)
@@ -24,6 +26,19 @@ namespace Bomberman
         public int GetVelocidad()
         {
             return velocidad;
+        }
+
+        public int LongitudBomba
+        {
+            get
+            {
+                return longitudBomba;
+            }
+
+            set
+            {
+                longitudBomba = value;
+            }
         }
     }
 }
