@@ -295,7 +295,6 @@ namespace Bomberman
 
             //Inicializamos bombas
             bombas = new List<Bomba>();
-            longitudBomba = 1;
 
             //se genera el mapa
             generarMapa();
@@ -305,7 +304,7 @@ namespace Bomberman
 
             //Se inicializa el contador
             tiempo = 101;
-            muerto = false;
+            muerto = true;
             final = false;
             pausado = false;
             base.Initialize();
@@ -351,22 +350,16 @@ namespace Bomberman
             pulsada = teclado.IsKeyDown(Keys.P) ? true : false;
             
             if (pausado)
-            {
                 if (teclado.IsKeyDown(Keys.Escape))
-                {
-                    muerto = true;
                     Exit();
-                }
-            }
 
 
             if (!pausado)
             {
                 //Colocar bomba
-                Bomba bAux;
                 if (teclado.IsKeyDown(Keys.E))
                 {
-                    bAux = new Bomba(jugador.X - (jugador.X % 40), jugador.Y - (jugador.Y % 40), longitudBomba);
+                    Bomba bAux = new Bomba(jugador.X - (jugador.X % 40), jugador.Y - (jugador.Y % 40), longitudBomba);
                     //He cambiado el .Equals() para que compare solo las posiciones X e Y
                     if (!bombas.Contains(bAux))
                     {
@@ -426,10 +419,7 @@ namespace Bomberman
 
                             if (new Rectangle(jugador.X, jugador.Y, 30, 30).Intersects(
                                     new Rectangle(e.X, e.Y, 40, 40)))
-                            {
-                                muerto = true;
                                 Exit();
-                            }
                         }
                     }
 
@@ -463,7 +453,7 @@ namespace Bomberman
                         if (new Rectangle(e.X, e.Y, 40, 40).Intersects(
                         new Rectangle(jugador.X, jugador.Y, 30, 30)))
                         {
-                            muerto = true;
+                            Thread.Sleep(3000);
                             Exit();
                         }
                     }
@@ -494,6 +484,7 @@ namespace Bomberman
                     new Rectangle(jugador.X, jugador.Y, 30, 30)) && enemigos.Count == 0)
                 {
                     puntuacion += 10000;
+                    muerto = false;
                     Exit();
                 }
                 //Colision con la mejora
