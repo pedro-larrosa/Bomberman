@@ -15,6 +15,7 @@ namespace Bomberman
         private SpriteBatch spriteBatch;
         SpriteFont texto;
         Dictionary<string, Usuario> puntuaciones;
+        int contLineas;
 
         public PantallaPuntuaciones()
         {
@@ -26,6 +27,30 @@ namespace Bomberman
             graphics.ApplyChanges();
         }
 
+        private void guardarPuntuaciones()
+        {
+            try
+            {
+                StreamWriter fichero = new StreamWriter("puntuaciones.txt");
+                foreach (var u in puntuaciones)
+                    fichero.WriteLine(u.Value.ToString());
+
+                fichero.Close();
+            }
+            catch (FileNotFoundException e)
+            {
+                Console.WriteLine("No se ha encontrado el archivo " + e.FileName);
+            }
+            catch (ArgumentException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
         protected override void Initialize()
         {
             puntuaciones = new Dictionary<string, Usuario>();
@@ -33,14 +58,23 @@ namespace Bomberman
             {
                 StreamReader fichero = new StreamReader("puntuaciones.txt");
                 string linea;
+                contLineas = 0;
                 string[] p, fecha;
+
                 while((linea = fichero.ReadLine()) != null)
                 {
                     p = linea.Split(";");
                     fecha = p[2].Split(" ")[0].Split("/");
-                    puntuaciones.Add(p[0], new Usuario(p[0], Convert.ToInt32(p[1]), 
-                        new DateTime(Convert.ToInt32(fecha[2]), Convert.ToInt32(fecha[1]), Convert.ToInt32(fecha[0]))));
+                    if (puntuaciones.ContainsKey(p[0]))
+                        puntuaciones.Remove(p[0]);
+                    
+                    puntuaciones.Add(p[0], new Usuario(p[0], Convert.ToInt32(p[1]),
+                    new DateTime(Convert.ToInt32(fecha[2]), Convert.ToInt32(fecha[1]), Convert.ToInt32(fecha[0]))));
+
+                    contLineas++;
                 }
+
+                fichero.Close();
             }catch(FileNotFoundException e)
             {
                 Console.WriteLine("No se ha encontrado el archivo " + e.FileName);
@@ -63,7 +97,11 @@ namespace Bomberman
         protected override void Update(GameTime gameTime)
         {
             if (Keyboard.GetState().IsKeyDown(Keys.Enter))
+            {
+                if (contLineas != puntuaciones.Count)
+                    guardarPuntuaciones();
                 Exit();
+            }
             base.Update(gameTime);
         }
 

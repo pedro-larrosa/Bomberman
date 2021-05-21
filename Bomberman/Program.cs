@@ -12,7 +12,7 @@ namespace Bomberman
             try
             {
                 StreamWriter fichero = File.AppendText("puntuaciones.txt");
-                fichero.WriteLine(u.GetNombre() + ";" + u.GetPuntuacion() + ";" + u.GetFecha());
+                fichero.WriteLine(u.ToString());
                 fichero.Close();
             }
             catch (FileNotFoundException e)

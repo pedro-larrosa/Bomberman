@@ -37,5 +37,10 @@ namespace Bomberman
         {
             return fecha;
         }
+
+        public override string ToString()
+        {
+            return nombre + ";" + puntuacion + ";" + fecha;
+        }
     }
 }

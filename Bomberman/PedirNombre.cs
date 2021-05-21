@@ -59,7 +59,7 @@ namespace Bomberman
             pulsada = tecla.IsKeyDown(Keys.Back) ? true : false;
 
             if ((tecla.GetPressedKeys().Length > 0) && (tecla.GetPressedKeys()[0] >= Keys.A && tecla.GetPressedKeys()[0] <= Keys.Z
-                || tecla.GetPressedKeys()[0] == Keys.Space))
+                || tecla.GetPressedKeys()[0] == Keys.Space || tecla.GetPressedKeys()[0] >= Keys.D0 && tecla.GetPressedKeys()[0] <= Keys.D9))
             {
                 if(nombre.Length < 10)
                 {
