@@ -372,15 +372,29 @@ namespace Bomberman
                     }
                 }
 
+
                 //Movimiento jugador
+                jugador.SetImagen(Content.Load<Texture2D>("jugador1"));
                 if (teclado.IsKeyDown(Keys.W))
+                {
                     jugador.Y -= (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                    jugador.SetImagen(Content.Load<Texture2D>("jugador1U"));
+                }
                 if (teclado.IsKeyDown(Keys.A))
+                {
                     jugador.X -= (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                    jugador.SetImagen(Content.Load<Texture2D>("jugador1L"));
+                }
                 if (teclado.IsKeyDown(Keys.S))
+                {
                     jugador.Y += (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                    jugador.SetImagen(Content.Load<Texture2D>("jugador1D"));
+                }
                 if (teclado.IsKeyDown(Keys.D))
+                {
                     jugador.X += (int)(jugador.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                    jugador.SetImagen(Content.Load<Texture2D>("jugador1R"));
+                }
 
                 //Se mueven los enemigos
                 foreach (Enemigo e in enemigos)

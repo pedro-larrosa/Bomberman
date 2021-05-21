@@ -31,7 +31,6 @@ namespace Bomberman
 
         static void Main(string[] args)
         {
-            Console.Write("fewrwe");
             Inicio inicio;
             int o = 0;
 

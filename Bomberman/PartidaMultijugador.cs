@@ -37,7 +37,7 @@ namespace Bomberman
             graphics.ApplyChanges();
         }
 
-        private bool colisiona(int x, int y, int d = 40)
+        private bool colisiona(int x, int y, int d = 40, bool esjugador1 = true)
         {
             bool colisiona = false;
             for (int i = 0; i < paredes.Count && !colisiona; i++)
@@ -54,6 +54,28 @@ namespace Bomberman
                     if (new Rectangle(x, y, d, d).Intersects(
                         new Rectangle(muros[i].X, muros[i].Y, 40, 40)))
                         colisiona = true;
+                }
+            }
+
+            if (!colisiona)
+            {
+                if (esjugador1)
+                {
+                    for (int i = 0; i < bombas2.Count && !colisiona; i++)
+                    {
+                        if (new Rectangle(x, y, d, d).Intersects(
+                            new Rectangle(bombas2[i].X, bombas2[i].Y, 40, 40)))
+                            colisiona = true;
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < bombas1.Count && !colisiona; i++)
+                    {
+                        if (new Rectangle(x, y, d, d).Intersects(
+                            new Rectangle(bombas1[i].X, bombas1[i].Y, 40, 40)))
+                            colisiona = true;
+                    }
                 }
             }
 
@@ -240,24 +262,50 @@ namespace Bomberman
 
 
                 //Jugador 1
+                jugador1.SetImagen(Content.Load<Texture2D>("jugador1"));
                 if (teclado.IsKeyDown(Keys.W))
+                {
                     jugador1.Y -= (int)(jugador1.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                    jugador1.SetImagen(Content.Load<Texture2D>("jugador1U"));
+                }
                 if (teclado.IsKeyDown(Keys.A))
+                {
                     jugador1.X -= (int)(jugador1.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                    jugador1.SetImagen(Content.Load<Texture2D>("jugador1L"));
+                }
                 if (teclado.IsKeyDown(Keys.S))
+                {
                     jugador1.Y += (int)(jugador1.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                    jugador1.SetImagen(Content.Load<Texture2D>("jugador1D"));
+                }
                 if (teclado.IsKeyDown(Keys.D))
+                {
                     jugador1.X += (int)(jugador1.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                    jugador1.SetImagen(Content.Load<Texture2D>("jugador1R"));
+                }
 
                 //Jugador 2
+                jugador2.SetImagen(Content.Load<Texture2D>("jugador2"));
                 if (teclado.IsKeyDown(Keys.Up))
+                {
                     jugador2.Y -= (int)(jugador2.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                    jugador2.SetImagen(Content.Load<Texture2D>("jugador2U"));
+                }
                 if (teclado.IsKeyDown(Keys.Left))
+                {
                     jugador2.X -= (int)(jugador2.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                    jugador2.SetImagen(Content.Load<Texture2D>("jugador2L"));
+                }
                 if (teclado.IsKeyDown(Keys.Down))
+                {
                     jugador2.Y += (int)(jugador2.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                    jugador2.SetImagen(Content.Load<Texture2D>("jugador2D"));
+                }
                 if (teclado.IsKeyDown(Keys.Right))
+                {
                     jugador2.X += (int)(jugador2.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                    jugador2.SetImagen(Content.Load<Texture2D>("jugador2R"));
+                }
 
 
                 //Bombas1
@@ -282,7 +330,7 @@ namespace Bomberman
                 }
 
                 //Colisiones jugador2
-                if (colisiona(jugador2.X, jugador2.Y, 30))
+                if (colisiona(jugador2.X, jugador2.Y, 30, false))
                 {
                     if (teclado.IsKeyDown(Keys.Up))
                         jugador2.Y += (int)(jugador2.GetVelocidad() * (float)gameTime.ElapsedGameTime.TotalSeconds);
