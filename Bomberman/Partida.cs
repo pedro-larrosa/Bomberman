@@ -303,7 +303,7 @@ namespace Bomberman
             generarEnemigos();
 
             //Se inicializa el contador
-            tiempo = 101;
+            tiempo = 201;
             muerto = true;
             final = false;
             pausado = false;
@@ -429,7 +429,7 @@ namespace Bomberman
                                 if (new Rectangle(enemigos[j].X, enemigos[j].Y, 40, 40).Intersects(
                                     new Rectangle(e.X, e.Y, 40, 40)))
                                 {
-                                    puntuacion += enemigos[i].GetType() == typeof(EnemigoFinal) ?
+                                    puntuacion += enemigos[j].GetType() == typeof(EnemigoFinal) ?
                                         300 : 100;
                                     enemigos.RemoveAt(j);
                                 }

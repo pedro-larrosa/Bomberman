@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.IO;
+using Microsoft.Xna.Framework.Media;
 
 namespace Bomberman
 {
@@ -57,6 +58,8 @@ namespace Bomberman
                             l = partida.GetLongitudBomba();
                             p = partida.GetPuntuacion();
                         } while (i <= 5 && !partida.JugadorMuerto());
+                        MediaPlayer.Stop();
+
                         if(!partida.GetPausado())
                         {
                             new PantallaFinal(partida.JugadorMuerto(), p).Run();

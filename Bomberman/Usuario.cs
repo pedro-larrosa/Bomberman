@@ -12,7 +12,7 @@ namespace Bomberman
 
         public Usuario(string nombre, int puntuacion, DateTime fecha)
         {
-            this.nombre = nombre;
+            this.nombre = nombre == "" ? "NoName" : nombre;
             this.puntuacion = puntuacion;
             this.fecha = fecha;
         }
