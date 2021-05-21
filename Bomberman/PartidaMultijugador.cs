@@ -352,9 +352,7 @@ namespace Bomberman
                     foreach (Explosion e in b.GetExplosion())
                         e.Dibujar(spriteBatch);
                 }
-            }
-
-            if (haTerminado)
+            }else
                 spriteBatch.DrawString(texto, "EL GANADOR ES EL JUGADOR " + (ganaJugador1 ? 1 : 2) + "!", new Vector2(520 / 2 - 150, 520 / 2 - 20), Color.Red);
             spriteBatch.End();
 

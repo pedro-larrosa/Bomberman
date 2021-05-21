@@ -6,6 +6,7 @@ using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 
 namespace Bomberman
 {
@@ -15,6 +16,7 @@ namespace Bomberman
         private SpriteBatch spriteBatch;
         SpriteFont texto;
         Texture2D fondoGris;
+        Song musicaFondo;
         static Random r;
         int nivel;
         int puntuacion;
@@ -337,6 +339,9 @@ namespace Bomberman
 
             texto = Content.Load<SpriteFont>("texto");
             fondoGris = Content.Load<Texture2D>("gris");
+            musicaFondo = Content.Load<Song>("musica");
+            MediaPlayer.Play(musicaFondo);
+            MediaPlayer.IsRepeating = true;
         }
 
         protected override void Update(GameTime gameTime)
@@ -447,14 +452,11 @@ namespace Bomberman
                     }
 
                     //Si el enemigo final te toca mueres
-                    if(e.GetType() == typeof(EnemigoFinal))
-                    {
-                        if (new Rectangle(e.X, e.Y, 40, 40).Intersects(
+                    if (new Rectangle(e.X + 10, e.Y + 10, 30, 30).Intersects(
                         new Rectangle(jugador.X, jugador.Y, 30, 30)))
-                        {
-                            Thread.Sleep(1500);
-                            Exit();
-                        }
+                    {
+                        Thread.Sleep(1500);
+                        Exit();
                     }
 
                 }
@@ -501,42 +503,47 @@ namespace Bomberman
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Green);
+            if(!pausado)
+                GraphicsDevice.Clear(Color.Green);
+            else
+                GraphicsDevice.Clear(Color.Black);
 
             spriteBatch.Begin();
-            spriteBatch.Draw(fondoGris, new Rectangle(0, 0, 920, 40), Color.White);
-            //Dibujar bombas
-            foreach (Bomba b in bombas)
+            if (!pausado)
             {
-                b.Dibujar(spriteBatch);
-                foreach (Explosion e in b.GetExplosion())
+                spriteBatch.Draw(fondoGris, new Rectangle(0, 0, 920, 40), Color.White);
+                //Dibujar bombas
+                foreach (Bomba b in bombas)
+                {
+                    b.Dibujar(spriteBatch);
+                    foreach (Explosion e in b.GetExplosion())
+                        e.Dibujar(spriteBatch);
+                }
+                //Dibujamos la puerta y la mejora si la hubiera
+                salida.Dibujar(spriteBatch);
+                if (mejora != null)
+                    mejora.Dibujar(spriteBatch);
+                //se dibuja el jugador
+                jugador.Dibujar(spriteBatch);
+                //Dibujar los muros
+                foreach (Obstaculo m in muros)
+                    m.Dibujar(spriteBatch);
+                //Dibujar las paredes
+                foreach (Obstaculo p in paredes)
+                    p.Dibujar(spriteBatch);
+                //Dibujamos a los enemigos
+                foreach (Enemigo e in enemigos)
                     e.Dibujar(spriteBatch);
-            }
-            //Dibujamos la puerta y la mejora si la hubiera
-            salida.Dibujar(spriteBatch);
-            if (mejora != null)
-                mejora.Dibujar(spriteBatch);
-            //se dibuja el jugador
-            jugador.Dibujar(spriteBatch);
-            //Dibujar los muros
-            foreach (Obstaculo m in muros)
-                m.Dibujar(spriteBatch);
-            //Dibujar las paredes
-            foreach (Obstaculo p in paredes)
-                p.Dibujar(spriteBatch);
-            //Dibujamos a los enemigos
-            foreach (Enemigo e in enemigos)
-                e.Dibujar(spriteBatch);
-            spriteBatch.DrawString(texto, "TIEMPO " + (int)tiempo, new Vector2(9, 9), Color.Black);
-            spriteBatch.DrawString(texto, "TIEMPO " + (int)tiempo, new Vector2(5, 5), Color.White);
-            spriteBatch.DrawString(texto, "PUNTUACION: " + puntuacion, new Vector2(254, 9), Color.Black);
-            spriteBatch.DrawString(texto, "PUNTUACION: " + puntuacion, new Vector2(250, 5), Color.White);
-            spriteBatch.DrawString(texto, "NIVEL " + nivel, new Vector2(754, 9), Color.Black);
-            spriteBatch.DrawString(texto, "NIVEL " + nivel, new Vector2(750, 5), Color.White);
-            if(pausado)
+                spriteBatch.DrawString(texto, "TIEMPO " + (int)tiempo, new Vector2(9, 9), Color.Black);
+                spriteBatch.DrawString(texto, "TIEMPO " + (int)tiempo, new Vector2(5, 5), Color.White);
+                spriteBatch.DrawString(texto, "PUNTUACION: " + puntuacion, new Vector2(254, 9), Color.Black);
+                spriteBatch.DrawString(texto, "PUNTUACION: " + puntuacion, new Vector2(250, 5), Color.White);
+                spriteBatch.DrawString(texto, "NIVEL " + nivel, new Vector2(754, 9), Color.Black);
+                spriteBatch.DrawString(texto, "NIVEL " + nivel, new Vector2(750, 5), Color.White);
+            }else
             {
-                spriteBatch.DrawString(texto, "PAUSADO", new Vector2(920 / 2 - 50, 560 / 2 - 30), Color.Red);
-                spriteBatch.DrawString(texto, "Pulsa Esc para salir", new Vector2(920 / 2 - 100, 560 / 2), Color.Red);
+                spriteBatch.DrawString(texto, "PAUSADO", new Vector2(920 / 2 - 50, 560 / 2 - 30), Color.White);
+                spriteBatch.DrawString(texto, "Pulsa Esc para salir", new Vector2(920 / 2 - 100, 560 / 2), Color.White);
             }
             spriteBatch.End();
             base.Draw(gameTime);

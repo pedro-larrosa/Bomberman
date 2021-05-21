@@ -49,7 +49,7 @@ namespace Bomberman
                         PedirNombre pantallaNombre = new PedirNombre();
                         pantallaNombre.Run();
                         string nombre = pantallaNombre.GetNombre();
-                        new Tutorial().Run();
+                        new Tutorial(false).Run();
 
                         do
                         {
@@ -65,6 +65,7 @@ namespace Bomberman
                         }
                         break;
                     case 2:
+                        new Tutorial(true).Run();
                         new PartidaMultijugador().Run();
                         break;
                     case 3:
